@@ -1,1 +1,1 @@
-# Počítačová grafika 2
+# PG 2
