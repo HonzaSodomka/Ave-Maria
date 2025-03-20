@@ -9,6 +9,9 @@ public:
     void report(void);
     int run(void);
 
+    void addMouseHandler(void);
+    void onMouseMove(GLfloat xoffset, GLfloat yoffset, GLboolean constraintPitch);
+
     ~App();
 private:
     Window* window;

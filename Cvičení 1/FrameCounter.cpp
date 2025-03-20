@@ -1,9 +1,13 @@
 #include "FrameCounter.h"
 #include <GLFW/glfw3.h>
+#include <ft2build.h>
+#include <iostream>
+#include <string>
 
 FrameCounter::FrameCounter()
 {
     frameCount = 0;
+    lastFrameCount = 0;
     previousTime = glfwGetTime();
     currentTime = glfwGetTime();
 }
@@ -23,6 +27,12 @@ int FrameCounter::getNumberOfFrames()
 
 void FrameCounter::setNumberOfFrames(int frames)
 {
+    lastFrameCount = frameCount;
     frameCount = frames;
     previousTime = glfwGetTime();
+}
+
+int FrameCounter::getLastNumberOfFrames()
+{
+    return this->lastFrameCount;
 }

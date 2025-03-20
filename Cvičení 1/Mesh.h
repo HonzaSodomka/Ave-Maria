@@ -7,6 +7,7 @@
 
 #include "Shader.h"
 #include "Vertex.h"
+#include "Material.h"
 
 /*
     - if texture_id is 0 it means that there is no texture.
@@ -18,9 +19,13 @@ public:
     std::vector<GLuint> indices;
     GLuint texture_id{ 0 };
     GLenum primitive_type = GL_TRIANGLES;
+    Material material;
 
     // Mesh material
-    glm::vec4 diffuse_color{ 1.0f };
+    glm::vec3 ambient{ 0.1f };
+    glm::vec3 diffuse{ 0.0f };
+    glm::vec3 specular{ 1.0f };
+    float shininess = 1.0f;
 
     // Indirect (indexed) Draw 
     Mesh(GLenum primitive_type, std::vector<Vertex>& vertices, std::vector<GLuint>& indices, GLuint texture_id);

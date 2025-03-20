@@ -1,5 +1,13 @@
 #pragma once
+#include "Logger.h"
 #include "Window.h"
+#include "Camera.h"
+
+// Initializing static variables
+float Window::lastX = 0.0f;
+float Window::lastY = 0.0f;
+bool Window::isMouseMoved = false;
+Camera* Window::cam = nullptr;
 
 Window::Window(int width, int height, const char* title, bool fullscreen, bool vsync)
     : fullscreen(fullscreen), vsync(vsync) {
@@ -30,6 +38,7 @@ Window::Window(int width, int height, const char* title, bool fullscreen, bool v
 
     glfwSetKeyCallback(window, key_callback);
     glfwSetScrollCallback(window, scroll_callback);
+    this->setVsync(vsync);
 }
 
 Window::~Window() {
@@ -41,7 +50,7 @@ GLFWwindow* Window::getWindow() const {
     return window;
 }
 
-void Window::set_fullscreen(bool fullscreen) {
+void Window::setFullscreen(bool fullscreen) {
     this->fullscreen = fullscreen;
     if (fullscreen) {
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();
@@ -54,7 +63,7 @@ void Window::set_fullscreen(bool fullscreen) {
     }
 }
 
-void Window::set_vsync(bool vsync)
+void Window::setVsync(bool vsync)
 {
     this->vsync = vsync;
 
@@ -78,19 +87,21 @@ bool Window::isFullscreen() const {
 
 // Static key callback function
 void Window::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+
     // glfwGetWindowUserPointer() vytáhne z okna custom pointer, který je k nìmu pøiøazen
     // v našem pøípadì jsem k tomu pøidadil instanci tøídy Window v jejím konstruktoru
     // static_cast<Window*> je type_casting syntax (pøevod datového typu) - tím my c++ øekneme, že ten pointer je na tøídu Window
     Window* instance = static_cast<Window*>(glfwGetWindowUserPointer(window));
     if (instance) {
-        instance->handle_key_event(key, action);
+        instance->onKeyEvent(key, action);
     }
+
 }
 
 /*
     Funkce pro handlování inputu v oknì.
 */
-void Window::handle_key_event(int key, int action) {
+void Window::onKeyEvent(int key, int action) {
 
     switch (action) {
         case GLFW_PRESS:
@@ -103,33 +114,62 @@ void Window::handle_key_event(int key, int action) {
 void Window::handle_key_press(int key, int action) {
     switch (key) {
         case GLFW_KEY_ESCAPE: {
-            glfwSetWindowShouldClose(window, GLFW_TRUE);
+            glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             break;
         }
         case GLFW_KEY_F: {
             fullscreen = !fullscreen;
-            set_fullscreen(fullscreen);
-            std::cout << "Fullscreen " << (fullscreen ? "enabled" : "disabled") << std::endl;
+            setFullscreen(fullscreen);
+            Logger::info("Fullscreen " + std::string(fullscreen ? "enabled" : "disabled"));
             break;
         }
         case GLFW_KEY_V: {
             vsync = !vsync;
-            set_vsync(vsync);
-            std::cout << "VSync " << (vsync ? "enabled" : "disabled") << std::endl;
+            setVsync(vsync);
+            Logger::info("VSync " + std::string(vsync ? "enabled" : "disabled"));
             break;
         }
     }
+}
+
+void Window::mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    // Check if any camera was assigned to the window,
+    // since default value is null pointer, which could lead
+    // to crashes. We do not want that.
+    if (Window::cam == nullptr) {
+        Logger::warning("No camera was assigned to the window");
+        return;
+    }
+
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (Window::isMouseMoved)
+    {
+        Window::lastX = xpos;
+        Window::lastY = ypos;
+        Window::isMouseMoved = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    lastX = xpos;
+    lastY = ypos;
+
+    Window::cam->onMouseEvent(xoffset, yoffset, GL_TRUE);
 }
 
 void Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     // Pro vysvìtlení viz Window::handle_key_event
     Window* instance = static_cast<Window*>(glfwGetWindowUserPointer(window));
     if (instance) {
-        instance->handle_scroll_event(xoffset, yoffset);
+        instance->onScrollEvent(xoffset, yoffset);
     }
 }
 
-void Window::handle_scroll_event(double xoffset, double yoffset) {
+void Window::onScrollEvent(double xoffset, double yoffset) {
     GLclampf redf = static_cast<GLclampf>(yoffset / 10);
     GLclampf greenf = static_cast<GLclampf>(yoffset / 10);
     GLclampf bluef = static_cast<GLclampf>(yoffset / 10);

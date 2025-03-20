@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <fstream>
 
 // trim from start (in place)
 inline void ltrim(std::string& s) {
@@ -31,4 +32,21 @@ inline std::vector<std::string> split(const std::string& str, char delimiter) {
     }
 
     return tokens;
+}
+
+inline std::string readFile(const std::string& filename) {
+    std::ifstream file(filename);
+
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return "";
+    }
+
+    std::string content;
+    std::string line;
+    while (std::getline(file, line)) {
+        content += line + '\n';
+    }
+
+    return content;
 }

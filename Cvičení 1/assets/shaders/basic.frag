@@ -1,9 +1,21 @@
 #version 430 core
 
-in vec3 color; // input from vertex stage of graphics pipeline, automatically interpolated
-out vec4 FragColor; // output color of current fragment: MUST be written
+// Input from vertex shader
+in vec2 TexCoords;        // Texture coordinates
+
+// Uniforms
+//uniform vec3 ambient;
+uniform vec3 diffuse;
+//uniform vec3 specular;
+
+// Texture (if applicable)
+uniform sampler2D texture_diffuse;
+
+// Output
+out vec4 FragColor;
 
 void main()
 {
-    FragColor = vec4(color, 1.0f); // copy RGB color, add Alpha=1.0 (not transparent)
+    vec3 result = diffuse;
+    FragColor = vec4(result, 1.0);
 }

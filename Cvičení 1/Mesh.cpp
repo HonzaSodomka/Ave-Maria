@@ -53,7 +53,13 @@ Mesh::Mesh(GLenum primitive_type, std::vector<Vertex>& vertices, std::vector<GLu
 void Mesh::draw(Shader& shader)
 {
 	shader.activate();
+
 	//TODO: draw mesh: bind vertex array object, draw all elements with selected primitive type, unbind vertex array object 
+
+	//shader.setUniform("ambient", ambient);
+	
+	//shader.setUniform("specular", specular);
+
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);

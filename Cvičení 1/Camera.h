@@ -4,6 +4,13 @@
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
+enum Camera_Movement {
+	FORWARD,
+	BACKWARD,
+	LEFT,
+	RIGHT
+};
+
 class Camera
 {
 public:
@@ -11,19 +18,23 @@ public:
 	// Camera Attributes
 	glm::vec3 Position;
 	glm::vec3 Front;
+	glm::vec3 Up;
 	glm::vec3 Right;
-	glm::vec3 Up; // camera local UP vector
+	glm::vec3 WorldUp;
 
-	GLfloat Yaw = -90.0f;
-	GLfloat Pitch = 30.0f;
-	GLfloat Roll = 30.0f;
+	GLfloat Yaw;
+	GLfloat Pitch;
+	GLfloat Roll;
 
 	GLfloat FOV = 60.0f;
 
 	// Camera options
 	GLfloat MovementSpeed;
-	GLfloat SprintFactor;
 	GLfloat MouseSensitivity;
+	GLfloat Zoom;
+
+	// TODO: Tohle se pak musí pøesunout jinam
+	GLfloat SprintFactor;
 
 	// Constructor
 	Camera(glm::vec3 position);
